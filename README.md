@@ -2,9 +2,9 @@
 A tweak that lets you change the volume sound by tapping on the volume slider in the controlCenter
 
 ## To-Do
-* Acctually upload the source code.
 * Make it show the ringer icon in the slider & in expanded mode.
 * Get a settings icon. (Anyone is welcome to send their icon)
+* Add an option to only switch to ringer mode when the slider is expanded(Maybe)
 
 ## Changlog
 * V1.0.0  
