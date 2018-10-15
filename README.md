@@ -18,3 +18,5 @@ A tweak that lets you change the volume sound by tapping on the volume slider in
 ## Credits
 * [Karimo299 (Twitter)](https://twitter.com/karimo299)
 * [Karimo299 (Reddit)](https://reddit.com/user/karimo299)
+
+I am open to any sugestions and recommendations to add features, and improve the tweak.
