@@ -57,7 +57,10 @@ static void loadPrefs() {
   expandOnly = [[prefs valueForKey:@"expandOnly"] boolValue];
 }
 
+<<<<<<< HEAD
 //Defines packages to be swapped later
+=======
+>>>>>>> 7ea304ade27c02db774bb68986d3619ce957d90f
 %hook CCUICAPackageDescription
 -(id)initWithPackageName:(id)arg1 inBundle:(id)arg2{
   if ([arg1 isEqual:@"Volume"]) {
