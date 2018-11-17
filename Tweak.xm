@@ -1,4 +1,4 @@
-@class CCUICAPackageDescription, CCUISliderModuleBackgroundViewController, UIGestureRecognizer, CCUIModuleSliderView, AVSystemController;
+@class CCUICAPackageDescription, CAPackage, CCUISliderModuleBackgroundViewController, UIGestureRecognizer, CCUIModuleSliderView, AVSystemController;
 //interfaces
 @interface VolumeControl : NSObject
 - (float)volume;
@@ -45,9 +45,9 @@ static VolumeControl *volCntl;
 static AVSystemController *avSys;
 
 //Beta
-static CCUICAPackageView *packView;
-static CCUICAPackageDescription *audPack;
-static CCUICAPackageDescription *ringPack;
+// static CCUICAPackageView *packView;
+static CCUICAPackageDescription *audDesc;
+static CCUICAPackageDescription *ringDesc;
 static NSBundle *ringerBundle = [NSBundle bundleWithURL:[NSURL URLWithString:@"file:///System/Library/ControlCenter/Bundles/MuteModule.bundle"]];
 
 //Loads the Preferences
@@ -61,8 +61,8 @@ static void loadPrefs() {
 %hook CCUICAPackageDescription
 -(id)initWithPackageName:(id)arg1 inBundle:(id)arg2{
   if ([arg1 isEqual:@"Volume"]) {
-      audPack = %orig;
-      return audPack;
+      audDesc = %orig;
+      return audDesc;
   } else {
     return %orig;
   }
@@ -93,7 +93,7 @@ static BOOL isExpanded;
 }
 
 //handles the tapGesture
-//You can either use the [packView setPackageDescription:ringPack/audPack]; or [slider setGlyphPackageDescription:ringPack/audPack];
+//You can either use the [packView setPackageDescription:ringDesc/audDesc]; or [slider setGlyphPackageDescription:ringDesc/audDesc];
 //packView sets the glyph really dim and slider sets it really white
  %new
 - (void)handleTapGesture:(UITapGestureRecognizer *)sender {
@@ -107,17 +107,17 @@ static BOOL isExpanded;
             [avSys setVolumeTo:[volCntl volume] forCategory:@"Ringtone"];
             [slider setValue:[volCntl volume]];
           }
-          ringPack = [%c(CCUICAPackageDescription) descriptionForPackageNamed:@"Mute" inBundle:ringerBundle];
-          [packView setPackageDescription:ringPack];
-          [slider setGlyphPackageDescription:nil];
+          ringDesc = [%c(CCUICAPackageDescription) descriptionForPackageNamed:@"Mute" inBundle:ringerBundle];
+          // [packView setPackageDescription:ringDesc];
+          [slider setGlyphPackageDescription:ringDesc];
           [slider setValue:ringVol];
       } else {
         if (!audVol) {
           [avSys setVolumeTo:[volCntl getMediaVolume] forCategory:@"Audio/Video"];
           [slider setValue:[volCntl getMediaVolume]];
         }
-        [packView setPackageDescription:audPack];
-        [slider setGlyphPackageDescription:nil];
+        // [packView setPackageDescription:audDesc];
+        [slider setGlyphPackageDescription:audDesc];
         [slider setValue:audVol];
         }
       }
@@ -133,18 +133,19 @@ static BOOL isExpanded;
   }
   return %orig;
 }
--(void)_configureGlyphPackageView:(id)arg1 {
-  arg1 = packView;
-  %orig;
-}
--(id)_newGlyphPackageView {
-  if ([self isKindOfClass:%c(CCUIVolumeSliderView)]) {
-  packView = %orig;
-  return packView;
-} else {
-  return %orig;
-}
-}
+
+// -(void)_configureGlyphPackageView:(id)arg1 {
+//   arg1 = packView;
+//   %orig;
+// }
+// -(id)_newGlyphPackageView {
+//   if ([self isKindOfClass:%c(CCUIVolumeSliderView)]) {
+//   packView = %orig;
+//   return packView;
+// } else {
+//   return %orig;
+// }
+// }
 
 //Prevents the slider value from going under 6% because IOS doesnt allow that
 - (void)_continueTrackingWithGestureRecognizer:(id)arg1 {
