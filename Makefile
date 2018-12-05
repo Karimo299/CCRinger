@@ -2,6 +2,8 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = CCRinger
 CCRinger_FILES = Tweak.xm
+CCRinger_EXTRA_FRAMEWORKS += Cephei
+
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 

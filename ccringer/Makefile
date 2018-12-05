@@ -5,6 +5,7 @@ CCRinger_FILES = CCRRootListController.m
 CCRinger_INSTALL_PATH = /Library/PreferenceBundles
 CCRinger_FRAMEWORKS = UIKit
 CCRinger_PRIVATE_FRAMEWORKS = Preferences
+CCRinger_EXTRA_FRAMEWORKS += CepheiPrefs
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

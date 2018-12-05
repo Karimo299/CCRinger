@@ -23,11 +23,6 @@
 		[[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"https://twitter.com/karimo299"]];
 	}
 
-		//Reddit button
-	- (void)reddit {
-		[[UIApplication sharedApplication] openURL:[NSURL URLWithString: @"https://reddit.com/user/Karimo299"]];
-	}
-
 	//Respring button
 	- (void) respring {
 		pid_t pid;

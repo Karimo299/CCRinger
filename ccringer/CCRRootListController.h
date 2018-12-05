@@ -3,6 +3,5 @@
 @interface CCRRootListController : PSListController
 - (void) git;
 - (void) tweet;
-- (void) reddit;
 - (void) respring;
 @end
