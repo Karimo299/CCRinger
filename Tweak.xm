@@ -51,6 +51,13 @@ static BOOL isExpanded;
   %orig;
 }
 
+-(void)_closeExpandedModule {
+  ringerMode = 0;
+  [slider setGlyphVisible:YES];
+  [slider setValue:[volCntl getMediaVolume]];
+  %orig; 
+}
+
 // This allows tapGesture on the volume slider when it loads
 - (void)viewWillLayoutSubviews {
   if (enabled) {

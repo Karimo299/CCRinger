@@ -1,7 +1,7 @@
 Package: com.karimo299.ccringer
 Name: CCRinger
 Depends: mobilesubstrate, PreferenceLoader
-Version: 1.0.0
+Version: 1.0.2
 Architecture: iphoneos-arm
 Description: Lets you change the ringer volume by tapping on the volume slider.
 Maintainer: Karimo299 <karimo299@yahoo.com>
