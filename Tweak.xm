@@ -37,7 +37,7 @@ static AVSystemController *avSys;
 static void loadPrefs() {
     static NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:@"com.karimo299.ccringer"];
 		enabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;
-		expandOnly = [prefs objectForKey:@"expandOnly"] ? [[prefs objectForKey:@"expandOnly"] boolValue] : NO;    
+		expandOnly = [prefs objectForKey:@"expandOnly"] ? [[prefs objectForKey:@"expandOnly"] boolValue] : NO;
 }
 
 %hook CCUIContentModuleContainerViewController
@@ -55,13 +55,13 @@ static BOOL isExpanded;
   ringerMode = 0;
   [slider setGlyphVisible:YES];
   [slider setValue:[volCntl getMediaVolume]];
-  %orig; 
+  %orig;
 }
 
 // This allows tapGesture on the volume slider when it loads
 - (void)viewWillLayoutSubviews {
   if (enabled) {
-    if ([MSHookIvar<NSString*>(self,"_moduleIdentifier") isEqual:@"com.apple.control-center.AudioModule"]) {
+    if ([MSHookIvar<NSString*>(self,"_moduleIdentifier") isEqual:@"com.apple.control-center.AudioModule"] || [MSHookIvar<NSString*>(self,"_moduleIdentifier") isEqual:@"com.jailbreak365.control-center.TinyAudio1131Module"] || [MSHookIvar<NSString*>(self,"_moduleIdentifier") isEqual:@"com.jailbreak365.control-center.TinyAudio1112Module."]) {
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
         [MSHookIvar<UIView*>(self,"_contentView") addGestureRecognizer:tapGesture];
     }
@@ -70,12 +70,10 @@ static BOOL isExpanded;
 }
 
 //handles the tapGesture
-//You can either use the [packView setPackageDescription:ringDesc/audDesc]; or [slider setGlyphPackageDescription:ringDesc/audDesc];
-//packView sets the glyph really dim and slider sets it really white
  %new
 - (void)handleTapGesture:(UITapGestureRecognizer *)sender {
   if (sender.state == UIGestureRecognizerStateRecognized) {
-    if ([MSHookIvar<NSString*>(self, "_moduleIdentifier") isEqual:@"com.apple.control-center.AudioModule"]) {
+    if ([MSHookIvar<NSString*>(self,"_moduleIdentifier") isEqual:@"com.apple.control-center.AudioModule"] || [MSHookIvar<NSString*>(self,"_moduleIdentifier") isEqual:@"com.jailbreak365.control-center.TinyAudio1131Module"] || [MSHookIvar<NSString*>(self,"_moduleIdentifier") isEqual:@"com.jailbreak365.control-center.TinyAudio1112Module."]) {
       isExpanded = MSHookIvar<BOOL>(self,"_expanded");
       if ((expandOnly && isExpanded) || !expandOnly) {
         ringerMode = !ringerMode;
@@ -168,4 +166,3 @@ static BOOL isExpanded;
 		CFNotificationSuspensionBehaviorDeliverImmediately);
     loadPrefs();
 }
-
