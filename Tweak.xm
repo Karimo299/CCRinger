@@ -36,9 +36,45 @@ static AVSystemController *avSys = [%c(AVSystemController) sharedAVSystemControl
 //Loads the Preferences
 static void loadPrefs() {
     static NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:@"com.karimo299.ccringer"];
-		enabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : NO;
+		enabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : YES;
 		expandOnly = [prefs objectForKey:@"expandOnly"] ? [[prefs objectForKey:@"expandOnly"] boolValue] : NO;
 }
+
+%hook CCUIModuleSliderView
+- (id)initWithFrame:(CGRect)frame {
+  if ([self isKindOfClass:%c(CCUIVolumeSliderView)]) slider = %orig;
+  return %orig;
+}
+
+-(void)layoutSubviews {
+  %orig;
+  if (ringerMode && !expandOnly) [slider setGlyphVisible:NO];
+}
+
+//Prevents the slider value from going under 6% because IOS doesnt allow that
+- (void)_continueTrackingWithGestureRecognizer:(id)arg1 {
+  [volCntl addAlwaysHiddenCategory:@"Ringtone"];
+  %orig;
+  if (ringerMode) {
+    if ([slider value] <= 0.0625) [slider setValue:0.0625];
+    [avSys setVolumeTo:[self value] forCategory:@"Ringtone"];
+    ringVol = [self value];
+    } else if (audVol) audVol = [self value];
+  }
+  %end
+
+  %hook VolumeControl
+-(void)_changeVolumeBy:(float)arg1 {
+  [volCntl removeAlwaysHiddenCategory:@"Ringtone"];
+  if (ringerMode && ![volCntl _isMusicPlayingSomewhere]) {
+    ringVol += arg1;
+    if (ringVol <= 0.0625) ringVol = 0.0625;
+    else if (ringVol >= 1) ringVol = 1;
+    [slider setValue:ringVol];
+
+    } else if (!ringerMode) %orig;
+  }
+%end
 
 %hook CCUIContentModuleContainerViewController
 static BOOL isExpanded;
@@ -52,12 +88,14 @@ static BOOL isExpanded;
   %orig;
 }
 
--(void)_closeExpandedModule {
+-(void)setExpanded:(BOOL)arg1 {
+  %orig;
+  if (expandOnly && !arg1) {
   ringerMode = 0;
   [slider setGlyphVisible:YES];
   [avSys getVolume:&audVol forCategory:@"Audio/Video"];
   [slider setValue:audVol];
-  %orig;
+  }
 }
 
 // This allows tapGesture on the volume slider when it loads
@@ -96,49 +134,12 @@ static BOOL isExpanded;
 }
 %end
 
-%hook CCUIModuleSliderView
-- (id)initWithFrame:(CGRect)frame {
-  if ([self isKindOfClass:%c(CCUIVolumeSliderView)]) {
-    slider = %orig;
-  }
-  return %orig;
-}
 
-//Prevents the slider value from going under 6% because IOS doesnt allow that
-- (void)_continueTrackingWithGestureRecognizer:(id)arg1 {
-  [volCntl addAlwaysHiddenCategory:@"Ringtone"];
-  %orig;
-  if (ringerMode && [slider value] <= 0.0625) {
-    [slider setValue:0.0625];
-  } else if ((ringerMode) || ([volCntl _isMusicPlayingSomewhere] && ringerMode)) {
-    [avSys setVolumeTo:[self value] forCategory:@"Ringtone"];
-    ringVol = [self value];
-  } else if (audVol) {
-    audVol = [self value];
-  }
+%hook MPVolumeController
+-(void)setVolumeValue:(float)arg1 {
+  if (!ringerMode) %orig;
 }
 %end
-
-%hook VolumeControl
-// updates slider value for the ringer.
-- (void)_changeVolumeBy:(float)arg1 {
-  [volCntl removeAlwaysHiddenCategory:@"Ringtone"];
-  if (ringerMode && ![volCntl _isMusicPlayingSomewhere]) {
-    ringVol += arg1;
-    if (ringVol <= 0.0625) {
-      ringVol = 0.0625;
-    } else if (ringVol >= 1) {
-      ringVol = 1;
-    }
-    [slider setValue:ringVol];
-  } else {
-    if (!ringerMode) {
-      %orig;
-    }
-  }
-}
-%end
-
 
 %ctor {
     CFNotificationCenterAddObserver(

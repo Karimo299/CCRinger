@@ -14,7 +14,7 @@
 				<key>cell</key>
 				<string>PSSwitchCell</string>
 				<key>default</key>
-				<false/>
+				<true/>
 				<key>PostNotification</key>
 				<string>com.karimo299.ccringer/prefChanged</string>
 				<key>defaults</key>
@@ -46,6 +46,20 @@
 			</dict>
 			<dict>
 				<key>cell</key>
+				<string>PSGroupCell</string>
+				<key>label</key>
+				<string></string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSButtonCell</string>
+				<key>label</key>
+				<string>Reset All Settings to Defualt</string>
+				<key>action</key>
+				<string>reset</string>
+			</dict>
+			<dict>
+				<key>cell</key>
 				<string>PSButtonCell</string>
 				<key>label</key>
 				<string>Respring</string>
@@ -61,10 +75,10 @@
 			<dict>
 				<key>big</key>
 				<true/>
-				<key>cellClass</key>
-				<string>HBTwitterCell</string>
 				<key>height</key>
 				<integer>56</integer>
+				<key>cellClass</key>
+				<string>HBTwitterCell</string>
 				<key>label</key>
 				<string>Karimo299</string>
 				<key>user</key>
@@ -73,12 +87,14 @@
 				<string>tweet</string>
 			</dict>
 			<dict>
-				<key>cell</key>
-				<string>PSButtonCell</string>
-				<key>icon</key>
-				<string>paypal.png</string>
+				<key>cellClass</key>
+				<string>HBLinkTableCell</string>
 				<key>label</key>
-				<string>Support my Work</string>
+				<string>Paypal</string>
+				<key>subtitle</key>
+				<string>Donate!</string>
+				<key>url</key>
+				<string>http://paypal.me/Karimo299</string>
 				<key>action</key>
 				<string>paypal</string>
 			</dict>
@@ -86,17 +102,17 @@
 				<key>cell</key>
 				<string>PSGroupCell</string>
 				<key>label</key>
-				<string>Source code</string>
-				<key>footerText</key>
-				<string>Thanks for downloading, enjoy :)</string>
+				<string></string>
 			</dict>
 			<dict>
-				<key>cell</key>
-				<string>PSButtonCell</string>
-				<key>icon</key>
-				<string>github.png</string>
+				<key>cellClass</key>
+				<string>HBLinkTableCell</string>
 				<key>label</key>
-				<string>Github</string>
+				<string>Source Code</string>
+				<key>subtitle</key>
+				<string>Check it out!</string>
+				<key>url</key>
+				<string>http://github.com/Karimo299/ControlPlz</string>
 				<key>action</key>
 				<string>git</string>
 			</dict>
