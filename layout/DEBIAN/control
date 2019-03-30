@@ -1,0 +1,11 @@
+Package: com.karimo299.ccringer
+Name: CCRinger
+Depends: mobilesubstrate, com.kaneb.kbpreferences, com.opa334.ccsupport
+Version: 2.0.0
+Architecture: iphoneos-arm
+Description: An awesome Ringer Control Center module! With combined system/ringer volume slider support
+Maintainer: Karimo299 & Kane Buckthorpe
+Author: Kane Buckthorpe & Karimo299
+Section: Control Center (Modules)
+Depiction: https://karimo299.github.io/repo/depictions/?p=com.karimo299.ccringer
+SileoDepiction: https://karimo299.github.io/repo/sileo/ccringer/
