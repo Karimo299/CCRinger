@@ -22,7 +22,7 @@
 				<key>key</key>
 				<string>isEnabled</string>
 				<key>label</key>
-				<string>Enable</string>
+				<string>Enable Tweak</string>
 			</dict>
 			<dict>
 				<key>cell</key>
@@ -54,7 +54,7 @@
 				<key>defaults</key>
 				<string>com.karimo299.ccringer</string>
 				<key>key</key>
-				<string>resetMode</string>
+				<string>rememberMode</string>
 				<key>label</key>
 				<string>Remember last mode</string>
 			</dict>

@@ -21,26 +21,28 @@
 @end
 
 @interface VolumeControl : NSObject
-+ (id)sharedVolumeControl;
-- (void)addAlwaysHiddenCategory:(id)arg1;
-- (void)removeAlwaysHiddenCategory:(id)arg1;
++(id)sharedVolumeControl;
+-(void)addAlwaysHiddenCategory:(id)arg1;
+-(void)removeAlwaysHiddenCategory:(id)arg1;
 @end
 
-@interface CCRingerController :  NSObject 
+@interface CCRingerController :  NSObject
 @property (nonatomic, retain) CCUIAudioModuleViewController *ccVolumeController;
 @property (nonatomic, retain) CCUISliderModuleBackgroundViewController *ccVolumeBackController;
 @property (nonatomic, assign) BOOL isRinger;
 @end
 
-static BOOL enabled=YES;
+static BOOL enabled = YES;
+static BOOL expandOnly = YES;
+static BOOL rememberMode = NO;
 
 @implementation CCRingerController
-- (void)handleTapGesture{
-	if (enabled ||self.isRinger){
+- (void)handleTapGesture {
+	if ((enabled && !expandOnly) || (enabled && expandOnly && [[self.ccVolumeController valueForKey:@"_expanded"] boolValue])) {
     self.isRinger = !self.isRinger;
     [self setGlyphs];
     [(CCUIVolumeSliderView *)self.ccVolumeController.view setValue:self.volume];
-    }
+  }
 }
 
 - (NSString *)category {
@@ -54,57 +56,39 @@ static BOOL enabled=YES;
 }
 
 - (void)setGlyphs {
-    CCUICAPackageDescription *packageDescription =
-        self.isRinger ? self.ringerPackageDescription
-                      : self.audioPackageDescription;
+    CCUICAPackageDescription *packageDescription = self.isRinger ? self.ringerPackageDescription : self.audioPackageDescription;
     [self.ccVolumeBackController setGlyphPackageDescription:packageDescription];
-    BOOL expanded =
-        [[self.ccVolumeController valueForKey:@"_expanded"] boolValue];
-
-    CCUIVolumeSliderView *volumeSlider =
-        (CCUIVolumeSliderView *)self.ccVolumeController.view;
-
+    BOOL expanded = [[self.ccVolumeController valueForKey:@"_expanded"] boolValue];
+    CCUIVolumeSliderView *volumeSlider = (CCUIVolumeSliderView *)self.ccVolumeController.view;
     [volumeSlider setGlyphVisible:!(self.isRinger || expanded)];
     volumeSlider.ringerGlyphImageView.hidden = (!self.isRinger || expanded);
 }
 
 - (CCUICAPackageDescription *)audioPackageDescription {
-    return [CCUICAPackageDescription
-        descriptionForPackageNamed:@"Volume"
-                          inBundle:[NSBundle
-                                       bundleWithURL:
-                                           [NSURL URLWithString:
-                                                      @"file:///System/Library/"
-                                                      @"ControlCenter/Bundles/"
-                                                      @"AudioModule.bundle"]]];
+	return [CCUICAPackageDescription descriptionForPackageNamed:@"Volume" inBundle:[NSBundle bundleWithURL: [NSURL URLWithString: @"file:///System/Library/ControlCenter/Bundles/AudioModule.bundle"]]];
 }
 
 - (CCUICAPackageDescription *)ringerPackageDescription {
-    return [CCUICAPackageDescription
-        descriptionForPackageNamed:@"Mute"
-                          inBundle:[NSBundle
-                                       bundleWithURL:
-                                           [NSURL URLWithString:
-                                                      @"file:///System/Library/"
-                                                      @"ControlCenter/Bundles/"
-                                                      @"MuteModule.bundle"]]];
+  return [CCUICAPackageDescription descriptionForPackageNamed:@"Mute" inBundle:[NSBundle bundleWithURL: [NSURL URLWithString: @"file:///System/Library/ControlCenter/Bundles/MuteModule.bundle"]]];
 }
 
 - (AVSystemController *)systemController {
-    return [%c(AVSystemController) sharedAVSystemController];
+	return [%c(AVSystemController) sharedAVSystemController];
 }
+
 - (VolumeControl *)volumeController {
-    return [%c(VolumeControl) sharedVolumeControl];
+	return [%c(VolumeControl) sharedVolumeControl];
 }
 @end
 
-CCRingerController*ringerController=[CCRingerController new];
+CCRingerController*ringerController = [CCRingerController new];
 
 static void loadPrefs() {
     static NSUserDefaults *prefs = [[NSUserDefaults alloc] initWithSuiteName:@"com.karimo299.ccringer"];
 		enabled = [prefs objectForKey:@"isEnabled"] ? [[prefs objectForKey:@"isEnabled"] boolValue] : YES;
-		///expandOnly = [prefs objectForKey:@"expandOnly"] ? [[prefs objectForKey:@"expandOnly"] boolValue] : NO;
-		
+		expandOnly = [prefs objectForKey:@"expandOnly"] ? [[prefs objectForKey:@"expandOnly"] boolValue] : NO;
+		rememberMode = [prefs objectForKey:@"rememberMode"] ? [[prefs objectForKey:@"rememberMode"] boolValue] : NO;
+
 		if(!enabled){
 		[ringerController handleTapGesture];
 		}
@@ -116,41 +100,47 @@ static void loadPrefs() {
     ringerController.ccVolumeBackController =(CCUISliderModuleBackgroundViewController*) %orig;
     return ringerController.ccVolumeBackController;
 }
+
 - (UIViewController *)contentViewController {
     ringerController.ccVolumeController = (CCUIAudioModuleViewController*)%orig;
-
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc]
-        initWithTarget:ringerController
-                action:@selector(handleTapGesture)];
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:ringerController action:@selector(handleTapGesture)];
     [ringerController.ccVolumeController.view addGestureRecognizer:tapGesture];
     return ringerController.ccVolumeController;
 }
 %end
 
 %hook CCUIAudioModuleViewController
--(void)viewDidDisappear:(BOOL)arg1 {
-	    [ringerController.volumeController removeAlwaysHiddenCategory:@"Ringtone"];
-		    NSLog(@"removeAlwaysHidden");
-}
--(void)_sliderValueDidChange:(CCUIVolumeSliderView*)slider {
-if (ringerController.isRinger){
-	slider.value=(slider.value>=0.07)? slider.value: 0.06;
-		    [ringerController.volumeController addAlwaysHiddenCategory:@"Ringtone"];
-	    NSLog(@"setAlwaysHidden");
-	[ringerController.systemController setVolumeTo:slider.value forCategory:ringerController.category];
+-(void)viewWillDisappear:(BOOL)arg1 {
+	[ringerController.volumeController removeAlwaysHiddenCategory:@"Ringtone"];
 
-}else{
-%orig;	
+	if (ringerController.isRinger && !rememberMode) {
+		[ringerController handleTapGesture];
+	}
 }
+
+-(void)_sliderValueDidChange:(CCUIVolumeSliderView*)slider {
+	if (ringerController.isRinger){
+		slider.value = (slider.value>=0.07) ? slider.value: 0.06;
+		[ringerController.volumeController addAlwaysHiddenCategory:@"Ringtone"];
+		[ringerController.systemController setVolumeTo:slider.value forCategory:ringerController.category];
+	} else {
+		%orig;
+	}
 }
+
 -(void)volumeController:(id)arg1 volumeValueDidChange:(float)arg2 {
 	if (!ringerController.isRinger){
 		%orig;
 	}
 }
+
 - (void)willTransitionToExpandedContentMode:(BOOL)willTransition {
-		    %orig;
-    [ringerController setGlyphs];
+	if (ringerController.isRinger && !willTransition && expandOnly) {
+		[ringerController handleTapGesture];
+	}
+	%orig;
+	[ringerController.volumeController addAlwaysHiddenCategory:@"Ringtone"];
+	[ringerController setGlyphs];
 }
 %end
 
@@ -158,7 +148,7 @@ extern NSString* const kCAFilterDestOut;
 
 %hook CCUIVolumeSliderView
 %property (nonatomic, retain) CCUICAPackageView *ringerGlyphImageView;
-%property (nonatomic, retain) UILabel *ringerPercentLabel;
+
 - (id)initWithFrame:(CGRect)frame {
 	CCUIVolumeSliderView *orig = %orig;
 	orig.ringerGlyphImageView = [self _newGlyphPackageView];
@@ -168,26 +158,22 @@ extern NSString* const kCAFilterDestOut;
 	orig.ringerGlyphImageView.layer.allowsGroupOpacity = YES;
 	orig.ringerGlyphImageView.layer.compositingFilter = kCAFilterDestOut;
 	[orig.ringerGlyphImageView setPackageDescription:ringerController.ringerPackageDescription];
-orig.ringerGlyphImageView.hidden=YES;
-
-
+	orig.ringerGlyphImageView.hidden = YES;
 	return orig;
 }
 
 - (void)layoutSubviews {
 	%orig;
-	
-	NSLog(@"sugarcane layout");
 	if ([self valueForKey:@"_glyphPackageView"]) {
 		UIView *glyphView = (UIView *)[self valueForKey:@"_glyphPackageView"];
 		if (self.ringerGlyphImageView) {
-				self.ringerGlyphImageView.layer.allowsGroupBlending = NO;
-				self.ringerGlyphImageView.layer.allowsGroupOpacity = YES;
-				self.ringerGlyphImageView.layer.compositingFilter = kCAFilterDestOut;
-				self.ringerGlyphImageView.frame=glyphView.frame;
+			self.ringerGlyphImageView.layer.allowsGroupBlending = NO;
+			self.ringerGlyphImageView.layer.allowsGroupOpacity = YES;
+			self.ringerGlyphImageView.layer.compositingFilter = kCAFilterDestOut;
+			self.ringerGlyphImageView.frame = glyphView.frame;
 		}
-		}
-		}
+	}
+}
 %end
 
 %end
@@ -210,7 +196,7 @@ static void bundleWasLoaded(CFNotificationCenterRef center, void *observer,
             CFNotificationCenterGetLocalCenter(), NULL, bundleWasLoaded,
             (CFStringRef)NSBundleDidLoadNotification, NULL,
             CFNotificationSuspensionBehaviorCoalesce);
-            
+
                 CFNotificationCenterAddObserver(
 		CFNotificationCenterGetDarwinNotifyCenter(), NULL,
 		(CFNotificationCallback)loadPrefs,

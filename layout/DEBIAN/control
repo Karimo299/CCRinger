@@ -5,7 +5,7 @@ Version: 2.0.0
 Architecture: iphoneos-arm
 Description: An awesome Ringer Control Center module! With combined system/ringer volume slider support
 Maintainer: Karimo299 & Kane Buckthorpe
-Author: Kane Buckthorpe & Karimo299
+Author: Karimo299 & Kane Buckthorpe
 Section: Control Center (Modules)
 Depiction: https://karimo299.github.io/repo/depictions/?p=com.karimo299.ccringer
 SileoDepiction: https://karimo299.github.io/repo/sileo/ccringer/

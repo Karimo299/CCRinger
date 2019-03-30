@@ -113,13 +113,13 @@
 			<array>
 				<dict>
 					<key>icon</key>
-					<string>/Library/Frameworks/KBPreferences.framework/twitter</string>
+					<string>/Library/PreferenceBundles/CCRingerTweakPrefs.bundle/twitter.png</string>
 					<key>link</key>
 					<string>https://twitter.com/indieDevKB</string>
 				</dict>
 				<dict>
 					<key>icon</key>
-					<string>/Library/Frameworks/KBPreferences.framework/paypal</string>
+					<string>/Library/PreferenceBundles/CCRingerTweakPrefs.bundle/paypal.png</string>
 					<key>link</key>
 					<string>https://www.paypal.me/kanebuckthorpe/2.00</string>
 				</dict>
@@ -128,6 +128,39 @@
 					<string>/Library/Frameworks/KBPreferences.framework/github</string>
 					<key>link</key>
 					<string>https://github.com/kanesbetas</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>cellClass</key>
+			<string>KBFooterCell</string>
+			<key>height</key>
+			<string>80</string>
+			<key>icon</key>
+			<string>https://twitter.com/karimo299/profile_image?size=original</string>
+			<key>label</key>
+			<string>Karimo299</string>
+			<key>roundIcon</key>
+			<true/>
+			<key>socialLinks</key>
+			<array>
+				<dict>
+					<key>icon</key>
+					<string>/Library/PreferenceBundles/CCRingerTweakPrefs.bundle/twitter.png</string>
+					<key>link</key>
+					<string>https://twitter.com/Karimo299</string>
+				</dict>
+				<dict>
+					<key>icon</key>
+					<string>/Library/PreferenceBundles/CCRingerTweakPrefs.bundle/paypal.png</string>
+					<key>link</key>
+					<string>https://www.paypal.me/Karimo299</string>
+				</dict>
+				<dict>
+					<key>icon</key>
+					<string>/Library/Frameworks/KBPreferences.framework/github</string>
+					<key>link</key>
+					<string>https://www.github.com/Karimo299/</string>
 				</dict>
 			</array>
 		</dict>
