@@ -3,6 +3,8 @@
 #import <ControlCenterUIKit/CCUIVolumeSliderView.h>
 #import <ControlCenterUIKit/CCUISliderModuleBackgroundViewController.h>
 #import <ControlCenterUIKit/CCUICAPackageView.h>
+#import <SpringBoard/VolumeControl.h>
+
 
 @interface CCUIModuleSliderView ()
 @property (nonatomic, retain) CCUICAPackageView *ringerGlyphImageView;
@@ -20,11 +22,6 @@
 +(id)sharedAVSystemController;
 @end
 
-@interface VolumeControl : NSObject
-+(id)sharedVolumeControl;
--(void)addAlwaysHiddenCategory:(id)arg1;
--(void)removeAlwaysHiddenCategory:(id)arg1;
-@end
 
 @interface CCRingerController :  NSObject
 @property (nonatomic, retain) CCUIAudioModuleViewController *ccVolumeController;
@@ -46,7 +43,7 @@ static BOOL rememberMode = NO;
 }
 
 - (NSString *)category {
-    return self.isRinger ? @"Ringtone" : @"Audio/Video";
+  return self.isRinger ? @"Ringtone" : @"Audio/Video";
 }
 
 - (float)volume {
@@ -111,25 +108,25 @@ static void loadPrefs() {
 
 %hook CCUIAudioModuleViewController
 -(void)viewWillDisappear:(BOOL)arg1 {
-	[ringerController.volumeController removeAlwaysHiddenCategory:@"Ringtone"];
-
 	if (ringerController.isRinger && !rememberMode) {
+ 		[ringerController.volumeController removeAlwaysHiddenCategory:@"Ringtone"];
 		[ringerController handleTapGesture];
 	}
+	%orig;
 }
 
 -(void)_sliderValueDidChange:(CCUIVolumeSliderView*)slider {
 	if (ringerController.isRinger){
-		slider.value = (slider.value>=0.07) ? slider.value: 0.06;
 		[ringerController.volumeController addAlwaysHiddenCategory:@"Ringtone"];
-		[ringerController.systemController setVolumeTo:slider.value forCategory:ringerController.category];
+		slider.value = (slider.value>=0.07) ? slider.value: 0.06;
+		[ringerController.systemController setVolumeTo:slider.value forCategory:@"Ringtone"];
 	} else {
 		%orig;
 	}
 }
 
 -(void)volumeController:(id)arg1 volumeValueDidChange:(float)arg2 {
-	if (!ringerController.isRinger){
+	if (!ringerController.isRinger) {
 		%orig;
 	}
 }
@@ -139,7 +136,6 @@ static void loadPrefs() {
 		[ringerController handleTapGesture];
 	}
 	%orig;
-	[ringerController.volumeController addAlwaysHiddenCategory:@"Ringtone"];
 	[ringerController setGlyphs];
 }
 %end
@@ -179,19 +175,15 @@ extern NSString* const kCAFilterDestOut;
 %end
 
 
-static void bundleWasLoaded(CFNotificationCenterRef center, void *observer,
-                            CFStringRef name, const void *object,
-                            CFDictionaryRef userInfo) {
+static void bundleWasLoaded(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     NSBundle *bundle = (__bridge NSBundle *)(object);
-    if ([bundle.bundleIdentifier
-            isEqualToString:@"com.apple.control-center.AudioModule"]) {
+    if ([bundle.bundleIdentifier isEqualToString:@"com.apple.control-center.AudioModule"] || [bundle.bundleIdentifier isEqualToString:@"com.jailbreak365.control-center.TinyAudio1131Module"] || [bundle.bundleIdentifier isEqualToString:@"com.jailbreak365.control-center.TinyAudio1112Module."]) {
 			%init(CCBundleHooks)
     }
 }
 
 %ctor{
-    if ([[NSBundle mainBundle].bundleIdentifier
-            isEqualToString:@"com.apple.springboard"]) {
+    if ([[NSBundle mainBundle].bundleIdentifier isEqualToString:@"com.apple.springboard"]) {
         CFNotificationCenterAddObserver(
             CFNotificationCenterGetLocalCenter(), NULL, bundleWasLoaded,
             (CFStringRef)NSBundleDidLoadNotification, NULL,

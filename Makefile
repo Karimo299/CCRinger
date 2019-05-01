@@ -1,10 +1,11 @@
+ARCHS = arm64 arm64e
 include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = CCRingerModule
 CCRingerModule_BUNDLE_EXTENSION = bundle
 CCRingerModule_FILES = CCRingerModule/CCRingerModule.m CCRingerModule/CCRingerModuleContentViewController.m CCRingerModule/CCRingerModuleContentViewController.m CCRingerModule/CCRingerModuleRootListController.m
 CCRingerModule_PRIVATE_FRAMEWORKS = ControlCenterUIKit Celestial Preferences
-CCRingerModule_EXTRA_FRAMEWORKS += KBPreferences 
+CCRingerModule_EXTRA_FRAMEWORKS += KBPreferences
 CCRingerModule_INSTALL_PATH = /Library/ControlCenter/Bundles/
 CCRingerModule_CFLAGS = -fobjc-arc
 

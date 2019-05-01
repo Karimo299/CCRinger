@@ -41,7 +41,7 @@ extern NSString *const kCAFilterDestOut;
 
 - (NSString *)glyphStateForValue:(float)value {
 
-    return (value >= 0.07) ? @"ringtone" : @"silent";
+    return (value >= 0.0625) ? @"ringtone" : @"silent";
 }
 
 - (float)volume {
@@ -53,14 +53,13 @@ extern NSString *const kCAFilterDestOut;
 
 - (void)viewWillAppear:(BOOL)arg1 {
     [super viewWillAppear:arg1];
-    [self.volumeController addAlwaysHiddenCategory:@"Ringtone"];
+    [self.volumeController removeAlwaysHiddenCategory:@"Ringtone"];
     self.sliderView.value = self.volume;
     [self setGlyphState:[self glyphStateForValue:self.volume]];
 }
 
 - (void)viewDidDisappear:(BOOL)arg1{
 	    [super viewDidDisappear:arg1];
-    [self.volumeController removeAlwaysHiddenCategory:@"Ringtone"];
 }
 
 // This is where you add your subviews (this is the first method when
@@ -87,8 +86,8 @@ extern NSString *const kCAFilterDestOut;
 
 /// Handle Slider
 - (void)valueChanged:(CCUIModuleSliderView *)slider {
-		    [self.volumeController addAlwaysHiddenCategory:@"Ringtone"];
-slider.value=(slider.value>=0.07)? slider.value: 0.06;
+		[self.volumeController addAlwaysHiddenCategory:@"Ringtone"];
+    slider.value=(slider.value>=0.07)? slider.value: 0.06;
     if (![self.audioController setVolumeTo:slider.value
                                forCategory:@"Ringtone"]) {
         NSLog(@"setVolumeForRingtone failed.");
@@ -109,7 +108,6 @@ slider.value=(slider.value>=0.07)? slider.value: 0.06;
 
 /// SliderCornerFix
 - (void)setSliderCornerRadius {
-
     float newCornerRadius = 0;
     for (UIView *view in self.view.superview.subviews) {
         if ([view isKindOfClass:[objc_getClass("MTMaterialView") class]]) {
